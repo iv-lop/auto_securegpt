@@ -34,7 +34,7 @@ from autobot.helper_functions import (
     click_send_data_button,
 )
 
-def securegpt_bot(
+def run_auto_securegpt(
         test,
         test_sample_size,
         inference_prompt_data_path,
@@ -171,7 +171,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     
     website_url = "https://securegpt.stanfordhealthcare.org/chat"
-    securegpt_bot(
+    run_auto_securegpt(
         test=args.test,
         test_sample_size=args.test_sample_size,
         inference_prompt_data_path=args.inference_prompt_data_path,
