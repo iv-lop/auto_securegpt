@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='Stanford SecureGPT Bot',
+    name='Auto-SecureGPT',
     version='0.1.0',
     packages=find_packages(),
     python_requires='==3.10.13',
