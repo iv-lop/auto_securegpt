@@ -11,3 +11,6 @@ conda create -n auto_sgpt python=3.10.13
 conda activate auto_sgpt
 pip install -e .
 ```
+
+## Instructions
+Detailed instructions on how to use this repo coming soon.
