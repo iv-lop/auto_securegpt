@@ -22,8 +22,8 @@ pd.set_option('display.max_rows', 50)
 pd.set_option('display.max_columns', None)
 pd.set_option('display.width', None)
 
-sys.path.append('~/stanford_securegpt_bot')
-from bot.helper_functions import (
+sys.path.append('~/auto_securegpt')
+from autobot.helper_functions import (
     send_data_and_get_output,
     check_for_terms_and_resend_data_if_needed,
     validate_latest_dialog_sent,
