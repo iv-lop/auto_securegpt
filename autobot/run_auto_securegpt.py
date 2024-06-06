@@ -41,6 +41,7 @@ def run_auto_securegpt(
         backup_data_path,
         disclaimer_statement,
         min_output_word_count,
+        output_column_name,
         terms_to_avoid,
         save_filename,
         save_folder_path,
@@ -100,9 +101,9 @@ def run_auto_securegpt(
         prompt_list = prompt_list[:test_sample_size]
         prompt_id_list = prompt_id_list[:test_sample_size]
 
-    print(f"\nGenerating Synthetic Data")
-    original_column_names = inference_prompt_data.columns.tolist()
-    llm_output = pd.DataFrame(columns=original_column_names + ['synthetic_data'])
+    print(f"\nGenerating Data")
+    original_column_names = inference_prompt_data.columns.tolist()+output_column_name
+    llm_output = pd.DataFrame(columns=original_column_names)
     global_iteration = 0
     total_iterations = len(prompt_list)
 
@@ -122,7 +123,7 @@ def run_auto_securegpt(
                 total_iterations=total_iterations,
                 llm_output=llm_output,
                 prompt_column_name='formatted_prompt',
-                output_column_name='synthetic_data',
+                output_column_name=output_column_name,
                 disclaimer_statement=disclaimer_statement,
                 terms_to_avoid=terms_to_avoid,
                 min_output_word_count=min_output_word_count,
@@ -138,18 +139,18 @@ def run_auto_securegpt(
             llm_output.to_csv(full_path, index=False)
             print(f"Progress saved to {full_path}")
             raise e
-    print(f"Synthetic Data Generated")
+    print(f"Data Generated")
 
     print(f"\nQuitting Chrome WebDriver")
     driver.quit()
     print(f"Chrome Driver Quit")
 
-    print(f"\nSaving Synthetic Data")
+    print(f"\nSaving Data")
     if test:
         save_filename = f"TEST_{save_filename}"
     full_path = os.path.join(save_folder_path, save_filename)
     llm_output.to_csv(full_path, index=False)
-    print(f"Synthetic Data Saved to {full_path}")
+    print(f"Data Saved to {full_path}")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Run SecureGPT Bot')
@@ -159,6 +160,7 @@ if __name__ == "__main__":
     parser.add_argument('backup_data_path', type=int, nargs='?', help='', default=None)
     parser.add_argument('disclaimer_statement', type=int, nargs='?', help='', default=None)
     parser.add_argument('min_output_word_count', type=int, nargs='?', help='', default=40)
+    parser.add_argument('output_column_name', type=int, nargs='?', help='')
     parser.add_argument('terms_to_avoid', type=int, nargs='?', help='python list', default=["As an AI language model", "As a language model", "As a language AI model"])
     parser.add_argument('save_filename', type=int, nargs='?', help='', default="gpt-4_{timestamp}_{prompt_filename}")
     parser.add_argument('save_folder_path', type=int, nargs='?', help='', default="~/Downloads")
@@ -178,6 +180,7 @@ if __name__ == "__main__":
         backup_data_path=args.backup_data_path,
         disclaimer_statement=args.disclaimer_statement,
         min_output_word_count=args.min_output_word_count,
+        output_column_name=args.output_column_name,
         terms_to_avoid=args.terms_to_avoid,
         save_filename=args.save_filename,
         save_folder_path=args.save_folder_path,
