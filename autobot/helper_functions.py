@@ -65,7 +65,8 @@ def send_data_and_get_output(
     if retries < max_data_loading_retries:        
         # Assuming the newest output is always last, get the last element's text and dialog sent
         latest_output = elements_start[-1].text.replace('Secure GPT (Beta)\n', '').replace('\n', ' ').lower()
-        latest_send = elements_end[-1].text.replace('Lopez Rodriguez, Ivan (SU)\n', '')
+        user_contained_text = elements_end[-1].text
+        latest_send = re.sub(r'.*\s\(SU\)\n', '', user_contained_text)
         word_count = len(latest_output.split())
         
         if global_iteration != 1:
@@ -81,7 +82,8 @@ def send_data_and_get_output(
     elif retries >= max_data_loading_retries:
         print(f"Data loading retries exceeded. Setting output as 'DATA_LOAD_FAILURE'")
         latest_output = "DATA_LOAD_FAILURE"
-        latest_send = elements_end[-1].text.replace('Lopez Rodriguez, Ivan (SU)\n', '')
+        user_contained_text = elements_end[-1].text
+        latest_send = re.sub(r'.*\s\(SU\)\n', '', user_contained_text)
         word_count = len(latest_output.split()) # recalculating word count for 'DATA_LOAD_FAILURE' to initiate check_for_terms_and_resend_data_if_needed() loop
     
     print(f"Checking LLM Output for terms to avoid...")
@@ -152,8 +154,22 @@ def check_for_terms_and_resend_data_if_needed(
         prompt_column_name,
         output_column_name,
 ):
-    while any(term in latest_output for term in terms_to_avoid) or word_count <= min_output_word_count:
-        print(f"LLM Inference Error:\n{latest_output}")
+    while True:
+        # Check conditions
+        contains_forbidden_terms = any(term.lower() in latest_output.lower() for term in terms_to_avoid)
+        below_min_word_count = word_count <= min_output_word_count
+
+        if not contains_forbidden_terms and not below_min_word_count:
+            break  # Exit loop if output is acceptable
+
+        # Debug printouts to identify the cause of the reiteration
+        if contains_forbidden_terms:
+            print("Output contains forbidden terms.")
+        if below_min_word_count:
+            print("Output is below the minimum word count.")
+
+        # Inform about the inference error with specifics
+        print(f"LLM Inference Error:\n{latest_output}\nWord Count: {word_count}\nForbidden Terms Present: {contains_forbidden_terms}")
 
         # Reset process
         print("\n\nCreating new chat window...")
@@ -193,9 +209,10 @@ def check_for_terms_and_resend_data_if_needed(
         if retries < max_data_loading_retries:        
             # Assuming the newest output is always last, get the last element's text and dialog sent
             latest_output = elements_start[-1].text.replace('Secure GPT (Beta)\n', '').replace('\n', ' ').lower()
-            latest_send = elements_end[-1].text.replace('Lopez Rodriguez, Ivan (SU)\n', '')
+            user_contained_text = elements_end[-1].text
+            latest_send = re.sub(r'.*\s\(SU\)\n', '', user_contained_text)
             word_count = len(latest_output.split())
-            
+
             if global_iteration != 1:
                 # Validate latest_output for content moderation failure
                 latest_output, latest_send = validate_latest_dialog_sent(
@@ -209,8 +226,10 @@ def check_for_terms_and_resend_data_if_needed(
         elif retries >= max_data_loading_retries:
             print(f"Data loading retries exceeded. Setting output as 'DATA_LOAD_FAILURE'")
             latest_output = "DATA_LOAD_FAILURE"
-            latest_send = elements_end[-1].text.replace('Lopez Rodriguez, Ivan (SU)\n', '')
+            user_contained_text = elements_end[-1].text
+            latest_send = re.sub(r'.*\s\(SU\)\n', '', user_contained_text)
             word_count = len(latest_output.split()) # recalculating word count for 'DATA_LOAD_FAILURE' to initiate check_for_terms_and_resend_data_if_needed() loop
+
     return latest_output, latest_send, word_count
 
 def validate_latest_dialog_sent(

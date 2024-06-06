@@ -21,7 +21,7 @@ python autobot/run_auto_securegpt.py \
     --input_data_path "~/llm_data/my_data.csv" \
     --prompt_column_name "my_prompt" \
     --output_column_name "gpt4_output" \
-    --terms_to_avoid '["As an AI language model", "As a language model", "As a language AI model"]' \
+    --terms_to_avoid 'As an AI language model, As a language model, As a language AI model' \
     --disclaimer_statement "I am going to give you a prompt. You don't need a file to perform the task. Just read the prompt and perform the task and don't give me any extra explanation." \
     --min_output_word_count 40 \
     --save_filename "gpt-4_{timestamp}_{prompt_filename}" \

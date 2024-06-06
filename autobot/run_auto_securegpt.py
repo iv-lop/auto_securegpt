@@ -56,6 +56,10 @@ def run_auto_securegpt(
 ):
     llm_inference_timestamp = datetime.now(pytz.utc).astimezone(pytz.timezone('US/Pacific')).strftime('%Y-%m-%d_%H:%M:%S')
 
+    print(f"Formatting terms to avoid")
+    terms_to_avoid = [term.strip() for term in args.terms_to_avoid.split(',') if term.strip()]
+    print(f"Formatted terms to avoid:\n{terms_to_avoid}")
+
     print(f"\nExpanding Paths")
     prompt_filename = os.path.basename(input_data_path)
     input_data_path = os.path.expanduser(input_data_path)
@@ -158,7 +162,7 @@ if __name__ == "__main__":
     parser.add_argument('--min_output_word_count', type=int, nargs='?', help='Minimum word count for the output', default=40)
     parser.add_argument('--prompt_column_name', type=str, nargs='?', help='Column name for the prompts')
     parser.add_argument('--output_column_name', type=str, nargs='?', help='Column name for the outputs')
-    parser.add_argument('--terms_to_avoid', type=str, nargs='?', help='List of terms to avoid', default='["As an AI language model", "As a language model", "As a language AI model"]')
+    parser.add_argument('--terms_to_avoid', type=str, help='List of terms to avoid', default= 'As an AI language model, As a language model, As a language AI model')
     parser.add_argument('--save_filename', type=str, nargs='?', help='Template for output file names', default="gpt-4_{timestamp}_{prompt_filename}")
     parser.add_argument('--save_folder_path', type=str, nargs='?', help='Path to save output files', default="~/Downloads")
     parser.add_argument('--max_chat_dialogs', type=int, nargs='?', help='Maximum number of chat dialogs to process', default=5)
@@ -168,12 +172,8 @@ if __name__ == "__main__":
     parser.add_argument('--retry_data_loading_wait_time', type=int, nargs='?', help='Wait time between data loading retries', default=5)
     parser.add_argument('--website_email_input', type=str, nargs='?', help='Email input for website', default=None)
     args = parser.parse_args()
-
-    # Convert JSON string to list
-    terms_to_avoid = json.loads(args.terms_to_avoid.replace("'", '"'))
-
+    
     website_url = "https://securegpt.stanfordhealthcare.org/chat"
-
     run_auto_securegpt(
         test=args.test,
         test_sample_size=args.test_sample_size,
