@@ -34,7 +34,7 @@ from helper_functions import (
     click_send_data_button,
 )
 
-def gpt4_inference(
+def securegpt_bot(
         test,
         test_sample_size,
         inference_prompt_data_path,
@@ -171,7 +171,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     
     website_url = "https://securegpt.stanfordhealthcare.org/chat"
-    gpt4_inference(
+    securegpt_bot(
         test=args.test,
         test_sample_size=args.test_sample_size,
         inference_prompt_data_path=args.inference_prompt_data_path,
