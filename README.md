@@ -13,4 +13,30 @@ pip install -e .
 ```
 
 ## Instructions
-Detailed instructions on how to use this repo coming soon.
+Example usage:
+```
+python autobot/run_auto_securegpt.py \
+    --test \
+    --test_sample_size 3 \
+    --input_data_path "~/llm_data/my_data.csv" \
+    --prompt_column_name "my_prompt" \
+    --output_column_name "gpt4_output" \
+    --terms_to_avoid '["As an AI language model", "As a language model", "As a language AI model"]' \
+    --disclaimer_statement "I am going to give you a prompt. You don't need a file to perform the task. Just read the prompt and perform the task and don't give me any extra explanation." \
+    --min_output_word_count 40 \
+    --save_filename "gpt-4_{timestamp}_{prompt_filename}" \
+    --save_folder_path "~/llm_data/gpt_outputs" \
+    --max_chat_dialogs 5 \
+    --input_text_lag_time 15 \
+    --generation_sleep_timer 50 \
+    --max_data_loading_retries 10 \
+    --retry_data_loading_wait_time 5 \
+    --website_email_input "ivlopez@stanford.edu"
+```
+
+Setting up the initial GPT environment using the SecureGPT UI requires your input. Make sure your screen looks like this before pressing '1' during the Chrome WebDriver setup stage of this script:
+<p align="center">
+  <img src="figures/chrome_setup.png" height="300">
+</p>
+
+![alt text](image.png)
