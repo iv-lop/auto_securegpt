@@ -6,8 +6,8 @@ Auto-SecureGPT is a library that helps automate Stanford's SecureGPT instance fo
 Auto-SecureGPT can be installed with `pip`:
 ```bash
 git clone https://github.com/iv-lop/auto_securegpt.git
-cd stanford_securegpt_bot
-conda create -n securegpt_bot python=3.10.13
-conda activate securegpt_bot
+cd auto_securegpt
+conda create -n auto_sgpt python=3.10.13
+conda activate auto_sgpt
 pip install -e .
 ```
