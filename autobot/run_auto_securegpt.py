@@ -167,6 +167,7 @@ if __name__ == "__main__":
     parser.add_argument('retry_data_loading_wait_time', type=int, nargs='?', help='', default=5)
     parser.add_argument('website_email_input', type=str, nargs='?', help='', default=None)
     args = parser.parse_args()
+    website_url = "https://securegpt.stanfordhealthcare.org/chat"
     
     run_auto_securegpt(
         test=args.test,
