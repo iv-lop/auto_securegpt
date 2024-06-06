@@ -39,4 +39,9 @@ Setting up the initial GPT environment using the SecureGPT UI requires your inpu
   <img src="figures/chrome_setup.png" height="300">
 </p>
 
-![alt text](image.png)
+Input data should be a CSV file where every row is a prompt sent to SecureGPT:
+| note_id | clean_prompt                                       |
+|---------|----------------------------------------------------|
+| 1       | polish this text: "The patient was hospitalized …  |
+| 2       | polish this text: "The patient was hospitalized for … |
+| 3       | polish this text: "The patient was admitted after … |
