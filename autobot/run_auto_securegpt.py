@@ -37,10 +37,11 @@ from autobot.helper_functions import (
 def run_auto_securegpt(
         test,
         test_sample_size,
-        inference_prompt_data_path,
+        input_data_path,
         backup_data_path,
         disclaimer_statement,
         min_output_word_count,
+        prompt_column_name,
         output_column_name,
         terms_to_avoid,
         save_filename,
@@ -56,30 +57,23 @@ def run_auto_securegpt(
     llm_inference_timestamp = datetime.now(pytz.utc).astimezone(pytz.timezone('US/Pacific')).strftime('%Y-%m-%d_%H:%M:%S')
 
     print(f"\nExpanding Paths")
-    prompt_filename = os.path.basename(inference_prompt_data_path)
-    inference_prompt_data_path = os.path.expanduser(inference_prompt_data_path)
+    prompt_filename = os.path.basename(input_data_path)
+    input_data_path = os.path.expanduser(input_data_path)
     save_filename = save_filename.format(timestamp=llm_inference_timestamp, prompt_filename=prompt_filename)
     save_folder_path = os.path.expanduser(save_folder_path)
     print(f"Paths Expanded")
 
-    print(f"\nExpanding Paths")
-    inference_prompt_data_path = os.path.expanduser(inference_prompt_data_path)
-    print(f"Paths Expanded")
-
     print(f"\nLoading Data")
-    inference_prompt_data = pd.read_csv(inference_prompt_data_path)
+    input_data_df = pd.read_csv(input_data_path)
+    if 'prompt_id' not in input_data_df.columns:
+        input_data_df['prompt_id'] = input_data_df.index + 1
     print(f"Data Loaded")
     if backup_data_path is not None:
         print(f"\nLoading Backup Data")
         saved_backup_data = pd.read_csv(os.path.expanduser(backup_data_path))
         print(f"Removing Already Processed Data from Inference Prompt Data")
-        inference_prompt_data = inference_prompt_data[~inference_prompt_data['prompt_id'].isin(saved_backup_data['prompt_id'])].reset_index(drop=True)
-    print(f"Data Loaded:\{inference_prompt_data}")
-
-    print(f"\nSetting Up Iteration Data")
-    prompt_list = inference_prompt_data['formatted_prompt'].to_list()
-    prompt_id_list = inference_prompt_data['prompt_id'].to_list()
-    print(f"Data Ready")
+        input_data_df = input_data_df[~input_data_df['prompt_id'].isin(saved_backup_data['prompt_id'])].reset_index(drop=True)
+    print(f"Data Loaded:\n{input_data_df}")
 
     print("\nSetup the Chrome WebDriver")
     if website_email_input is not None:
@@ -98,22 +92,21 @@ def run_auto_securegpt(
 
     if test:
         print(f"\n\n***Loading Testing Environment***\n\n")
-        prompt_list = prompt_list[:test_sample_size]
-        prompt_id_list = prompt_id_list[:test_sample_size]
+        input_data_df = input_data_df.head(test_sample_size)
 
     print(f"\nGenerating Data")
-    original_column_names = inference_prompt_data.columns.tolist()+output_column_name
-    llm_output = pd.DataFrame(columns=original_column_names)
+    original_column_names = input_data_df.columns.tolist()
+    llm_output = pd.DataFrame(columns=original_column_names + [output_column_name])
     global_iteration = 0
-    total_iterations = len(prompt_list)
+    total_iterations = len(input_data_df)
 
-    for prompt, prompt_id in zip(prompt_list, prompt_id_list):
+    for index, row in input_data_df.iterrows():
         try:
             global_iteration += 1
             print(f"\n\nProcessing iteration {global_iteration}/{total_iterations}")
             latest_output, latest_send = send_data_and_get_output(
                 driver=driver,
-                prompt=prompt, 
+                prompt=row[prompt_column_name], 
                 input_text_lag_time=input_text_lag_time,
                 generation_sleep_timer=generation_sleep_timer,
                 max_data_loading_retries=max_data_loading_retries,
@@ -122,14 +115,16 @@ def run_auto_securegpt(
                 global_iteration=global_iteration,
                 total_iterations=total_iterations,
                 llm_output=llm_output,
-                prompt_column_name='formatted_prompt',
+                prompt_column_name=prompt_column_name,
                 output_column_name=output_column_name,
                 disclaimer_statement=disclaimer_statement,
                 terms_to_avoid=terms_to_avoid,
                 min_output_word_count=min_output_word_count,
                 )
 
-            current_data = {'prompt_id': prompt_id, 'formatted_prompt': latest_send, 'synthetic_data': latest_output}
+            current_data = {col: row[col] for col in input_data_df.columns}
+            current_data[prompt_column_name] = latest_send
+            current_data[output_column_name] = latest_output
             llm_output = pd.concat([llm_output, pd.DataFrame([current_data])], ignore_index=True)
         except Exception as e:
             print("An error occurred. Saving progress...")
@@ -154,32 +149,33 @@ def run_auto_securegpt(
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Run SecureGPT Bot')
-    parser.add_argument('test', type=int, nargs='?', help='Start testing environment', default=False)
+    parser.add_argument('test', type=bool, nargs='?', help='Start testing environment', default=False)
     parser.add_argument('test_sample_size', type=int, nargs='?', help='', default=5)
-    parser.add_argument('inference_prompt_data_path', type=int, nargs='?', help='')
-    parser.add_argument('backup_data_path', type=int, nargs='?', help='', default=None)
-    parser.add_argument('disclaimer_statement', type=int, nargs='?', help='', default=None)
+    parser.add_argument('input_data_path', type=str, nargs='?', help='')
+    parser.add_argument('backup_data_path', type=str, nargs='?', help='', default=None)
+    parser.add_argument('disclaimer_statement', type=str, nargs='?', help='', default="I am going to give you a prompt. You don't need a file to perform the task. Just read the prompt and perform the task and don't give me any extra explanation.")
     parser.add_argument('min_output_word_count', type=int, nargs='?', help='', default=40)
-    parser.add_argument('output_column_name', type=int, nargs='?', help='')
-    parser.add_argument('terms_to_avoid', type=int, nargs='?', help='python list', default=["As an AI language model", "As a language model", "As a language AI model"])
-    parser.add_argument('save_filename', type=int, nargs='?', help='', default="gpt-4_{timestamp}_{prompt_filename}")
-    parser.add_argument('save_folder_path', type=int, nargs='?', help='', default="~/Downloads")
+    parser.add_argument('prompt_column_name', type=str, nargs='?', help='')
+    parser.add_argument('output_column_name', type=str, nargs='?', help='')
+    parser.add_argument('terms_to_avoid', type=list, nargs='?', help='python list', default=["As an AI language model", "As a language model", "As a language AI model"])
+    parser.add_argument('save_filename', type=str, nargs='?', help='', default="gpt-4_{timestamp}_{prompt_filename}")
+    parser.add_argument('save_folder_path', type=str, nargs='?', help='', default="~/Downloads")
     parser.add_argument('max_chat_dialogs', type=int, nargs='?', help='', default=5)
     parser.add_argument('input_text_lag_time', type=int, nargs='?', help='', default=15)
     parser.add_argument('generation_sleep_timer', type=int, nargs='?', help='', default=50)
     parser.add_argument('max_data_loading_retries', type=int, nargs='?', help='', default=10)
     parser.add_argument('retry_data_loading_wait_time', type=int, nargs='?', help='', default=5)
-    parser.add_argument('website_email_input', type=int, nargs='?', help='', default=None)
+    parser.add_argument('website_email_input', type=str, nargs='?', help='', default=None)
     args = parser.parse_args()
     
-    website_url = "https://securegpt.stanfordhealthcare.org/chat"
     run_auto_securegpt(
         test=args.test,
         test_sample_size=args.test_sample_size,
-        inference_prompt_data_path=args.inference_prompt_data_path,
+        input_data_path=args.input_data_path,
         backup_data_path=args.backup_data_path,
         disclaimer_statement=args.disclaimer_statement,
         min_output_word_count=args.min_output_word_count,
+        prompt_column_name=args.prompt_column_name,
         output_column_name=args.output_column_name,
         terms_to_avoid=args.terms_to_avoid,
         save_filename=args.save_filename,
