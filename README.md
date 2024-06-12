@@ -40,7 +40,7 @@ Setting up the initial GPT environment using the SecureGPT UI requires your inpu
 </p>
 
 Input data should be a CSV file where every row is a prompt sent to SecureGPT:
-| note_id | clean_prompt                                       |
+| note_id | my_prompt                                       |
 |---------|----------------------------------------------------|
 | 1       | polish this text: "The patient was hospitalized …  |
 | 2       | polish this text: "The patient was hospitalized for … |
