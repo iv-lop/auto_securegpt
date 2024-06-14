@@ -45,3 +45,25 @@ Input data should be a CSV file where every row is a prompt sent to SecureGPT:
 | 1       | polish this text: "The patient was hospitalized …  |
 | 2       | polish this text: "The patient was hospitalized for … |
 | 3       | polish this text: "The patient was admitted after … |
+
+## Citing Auto-SecureGPT
+If you use this software in your research, please cite it using the following DOI: [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.11649165.svg)](https://doi.org/10.5281/zenodo.11649165)
+
+APA Style: 
+```
+Lopez, I. (2024). Auto-SecureGPT (Version 0.1.0) [Software]. https://doi.org/10.5281/zenodo.11649165
+```
+
+BibTeX Entry:
+```
+@software{auto_securegpt,
+  author       = {Ivan Lopez},
+  title        = {Auto-SecureGPT},
+  month        = jun,
+  year         = 2024,
+  version      = {0.1.0},
+  publisher    = {Zenodo},
+  doi          = {10.5281/zenodo.11649165},
+  url          = {https://github.com/iv-lop/auto_securegpt}
+}
+```
