@@ -53,18 +53,17 @@ If you use this software in your research, please cite it using the following DO
 
 APA Style: 
 ```
-Lopez, I. (2024). Auto-SecureGPT (Version 0.1.0) [Software]. https://doi.org/10.5281/zenodo.11649165
+Lopez, I. (2024). Auto-SecureGPT (Version 0.1.0) [Computer software]. https://doi.org/10.5281/zenodo.11649165
 ```
 
 BibTeX Entry:
 ```
-@software{auto_securegpt,
-  author       = {Ivan Lopez},
+@software{Lopez_Auto-SecureGPT_2024,
+  author       = {Lopez, Ivan},
   title        = {Auto-SecureGPT},
   month        = jun,
   year         = 2024,
   version      = {0.1.0},
-  publisher    = {Zenodo},
   doi          = {10.5281/zenodo.11649165},
   url          = {https://github.com/iv-lop/auto_securegpt}
 }
