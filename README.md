@@ -47,7 +47,9 @@ Input data should be a CSV file where every row is a prompt sent to SecureGPT:
 | 3       | polish this text: "The patient was admitted after … |
 
 ## Citing Auto-SecureGPT
-If you use this software in your research, please cite it using the following DOI: [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.11649165.svg)](https://doi.org/10.5281/zenodo.11649165)
+If you use this software in your research, please cite it using the following DOI: 
+
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.11649165.svg)](https://doi.org/10.5281/zenodo.11649165)
 
 APA Style: 
 ```
