@@ -31,7 +31,7 @@ python autobot/run_auto_securegpt.py \
     --generation_sleep_timer 50 \
     --max_data_loading_retries 10 \
     --retry_data_loading_wait_time 5 \
-    --website_email_input "ivlopez@stanford.edu"
+    --website_email_input "myemail@stanford.edu"
 ```
 
 Setting up the initial GPT environment using the SecureGPT UI requires your input. Make sure your screen looks like this before pressing '1' during the Chrome WebDriver setup stage of this script:
